@@ -130,19 +130,22 @@ public class ChainOfResponibilityHelper{
     
     
     public static func prepareChainFromHandlers(hadlers: [Manager]) -> Manager? {
-
-        var currentHandler = hadlers.last
-        var currenIndex = hadlers.count
         
         
-        while currenIndex  > 0{
+        let firstHandler = hadlers.first
+        var currentHandler = hadlers.first
+        var currenIndex = 0
+        
+        
+        while currenIndex  < hadlers.count{
             
-            currenIndex -= 1
+            
             currentHandler?.nextManager = hadlers[currenIndex]
             currentHandler = hadlers[currenIndex]
+            currenIndex += 1
         }
-        
-        return currentHandler
+                
+        return firstHandler
     }
     
 }
