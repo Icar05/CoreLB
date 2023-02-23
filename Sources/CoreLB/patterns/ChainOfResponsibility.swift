@@ -136,10 +136,7 @@ public class ChainOfResponibilityHelper{
         var currentHandler = hadlers.first
         var currenIndex = 0
         
-        
         while currenIndex  < hadlers.count{
-            
-            
             currentHandler?.nextManager = hadlers[currenIndex]
             currentHandler = hadlers[currenIndex]
             currenIndex += 1
