@@ -15,6 +15,9 @@ public protocol Handler{
 // in order to have equel behaviour of each elements of chaint
 public protocol AbstractElement{
     func handleRequest(data: String)
+    
+    @discardableResult
+    func setNext( _ element: AbstractElement) -> AbstractElement
 }
 
 private protocol ResponsibleElement: AbstractElement{
@@ -98,6 +101,13 @@ public class Element: ResponsibleElement{
 
     public init( _ handler: Handler){
         self.handler = handler
+    }
+    
+    @discardableResult
+    public func setNext( _ element: AbstractElement) -> AbstractElement{
+        self.nextElement = element
+        
+        return element
     }
 }
 
