@@ -41,7 +41,8 @@ public class Decorator: ConcreteComponent {
     public init(_ component: Component) {
         self.component = component
     }
-    
+    // this moment similar to chain of responsibility. Only one difference -
+    // previous component is setted from contructor
     public final override func operation() {
         self.extraOperation()
         self.component.operation()
