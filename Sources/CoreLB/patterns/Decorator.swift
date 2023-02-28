@@ -10,14 +10,14 @@ import Foundation
 
 /// Базовый интерфейс Компонента определяет поведение, которое изменяется
 /// декораторами.
-public protocol Component {
+public protocol DecoratorComponent {
     func operation()
 }
 
 
 /// Конкретные Компоненты предоставляют реализации поведения по умолчанию. Может
 /// быть несколько вариаций этих классов.
-public class ConcreteComponent: Component {
+public class ConcreteComponent: DecoratorComponent {
     
     public init(){}
     
@@ -36,9 +36,9 @@ public class ConcreteComponent: Component {
 /// инициализации.
 public class Decorator: ConcreteComponent {
 
-    private var component: Component
+    private var component: DecoratorComponent
 
-    public init(_ component: Component) {
+    public init(_ component: DecoratorComponent) {
         self.component = component
     }
     // this moment similar to chain of responsibility. Only one difference -
