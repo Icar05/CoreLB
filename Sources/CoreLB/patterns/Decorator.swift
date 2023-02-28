@@ -3,7 +3,7 @@
 //  
 //
 //  Created by Галяткин Александр on 24.02.2023.
-//
+//  https://refactoring.guru/ru/design-patterns/composite/swift/example#lang-features - base from here
 
 import Foundation
 
