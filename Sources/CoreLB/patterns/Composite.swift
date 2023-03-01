@@ -44,6 +44,8 @@ extension CompositeComponent {
     }
 }
 
+
+
 /// Класс Лист представляет собой конечные объекты структуры.  Лист не может
 /// иметь вложенных компонентов.
 ///
@@ -77,7 +79,12 @@ class Composite: CompositeComponent {
     }
 
     func remove(component: CompositeComponent) {
-        // ...
+        children.indices.forEach{
+            if(children[$0].operation() == component.operation()){
+                children[$0].parent = nil
+                children.remove(at: $0)
+            }
+        }
     }
 
     func isComposite() -> Bool {
