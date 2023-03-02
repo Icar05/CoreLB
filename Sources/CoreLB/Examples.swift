@@ -15,6 +15,11 @@ public final class Examples{
     
     
     
+    public func testAsyncCollector(){
+        TestAboutActions().test()
+    }
+    
+    
     /** example of builder  using **/
     public func testComposite(){
         Client.testSimpleThree()
