@@ -11,6 +11,7 @@ import Foundation
 public protocol Handler{
     func handle(data: String)
     func canHandle(data: String) -> Bool
+    static func instantiate() -> Handler
 }
 // in order to have equel behaviour of each elements of chaint
 public protocol AbstractElement{
@@ -18,17 +19,21 @@ public protocol AbstractElement{
     
     @discardableResult
     func setNext( _ element: AbstractElement) -> AbstractElement
+    var nextElement: AbstractElement? { get }
 }
 
-private protocol ResponsibleElement: AbstractElement{
-    var handler: Handler { get }
-    var nextElement: AbstractElement? { get set }
+private protocol ResponsibleElement<T>: AbstractElement {
+    
+    associatedtype T : Handler
+    
+    var handler: T { get }
 }
 
 // in order to have equel behaviour of each elements of chaint
 extension ResponsibleElement {
     
   public func handleRequest(data: String){
+      
         if(handler.canHandle(data: data)){
             handler.handle(data: data)
         }else{
@@ -41,118 +46,120 @@ public class ZHandler: Handler{
     
     private let canHandle = true
     
-    public init(){
-        
-    }
-    
     public func handle(data: String) {
-        print("Chain, ZHandler handle: \(data)")
+        print("\nZHandler handle: \(data)\n")
     }
     
     public func canHandle(data: String) -> Bool {
-        print("Chain, ZHandler canHandle: \(canHandle)")
+        print("\(data)  [ZHandler] -> \(canHandle)")
         return canHandle
+    }
+    
+    public static func instantiate() -> Handler {
+        return ZHandler()
     }
 }
 
 
 public class YHandler: Handler{
     
+
     private let canHandle = false
     
-    public init(){
-        
-    }
-    
     public func handle(data: String) {
-        print("Chain, YHandler handle: \(data)")
+        print("\nYHandler handle: \(data)\n")
     }
     
     public func canHandle(data: String) -> Bool {
-        print("Chain, YHandler canHandle: \(canHandle)")
+        print("\(data)  [YHandler] -> \(canHandle)")
         return canHandle
+    }
+    
+    public static func instantiate() -> Handler {
+        return YHandler()
     }
 }
 
 public class XHandler: Handler{
+   
+    
     
     private let canHandle = false
     
-    public init(){
-        
-    }
-    
     public func handle(data: String) {
-        print("Chain, XHandler handle: \(data)")
+        print("\nXHandler handle: \(data)\n")
     }
     
     public func canHandle(data: String) -> Bool {
-        print("Chain, XHandler canHandle: \(canHandle)")
+        print("\(data)  [XHandler] -> \(canHandle)")
         return canHandle
+    }
+    
+    public static func instantiate() -> Handler {
+        return XHandler()
     }
 }
 
-public class Element: ResponsibleElement{
+public class Element<T>: ResponsibleElement where T: Handler{
     
     
-    fileprivate var handler: Handler
+    fileprivate var handler: T
     
     public var nextElement: AbstractElement?
 
-    public init( _ handler: Handler){
-        self.handler = handler
+    public init(){
+        self.handler = T.instantiate() as! T
     }
     
     @discardableResult
     public func setNext( _ element: AbstractElement) -> AbstractElement{
         self.nextElement = element
-        
+                
         return element
     }
 }
 
 public class ChainOfResponibilityHelper{
-    
-   
-    private var firstElement: Element? = nil
-    
-    private var currentElement: Element? = nil
-    
-    
+
+    private var firstElement: AbstractElement? = nil
+
+    private var currentElement: AbstractElement? = nil
+
+
     public init(){}
-    
-    
-    public func appendElement( _ manager: Element) -> ChainOfResponibilityHelper{
-        
+
+
+    public func appendElement( _ element: AbstractElement) -> ChainOfResponibilityHelper{
+
         if(firstElement == nil){
-            self.firstElement = manager
+            self.firstElement = element
         }else{
-            self.currentElement?.nextElement = manager
+            self.currentElement?.setNext(element)
         }
-    
-        self.currentElement = manager
-        
+
+        self.currentElement = element
+
         return self
     }
-    
+
     public func handleRequest( _ request: String){
         self.firstElement?.handleRequest(data: request)
     }
-    
-    
+
+
     //prepare chain from different elements
-    public static func prepareChainFromHandlers(hadlers: [Element]) -> Element? {
-    
+    public static func prepareChainFromHandlers(hadlers: [AbstractElement]) -> AbstractElement? {
+
         let firstElement = hadlers.first
         var currentElement = hadlers.first
         var currenIndex = 0
-        
+
         while currenIndex  < hadlers.count{
-            currentElement?.nextElement = hadlers[currenIndex]
+            currentElement?.setNext(hadlers[currenIndex])
             currentElement = hadlers[currenIndex]
             currenIndex += 1
         }
-                
+
         return firstElement
     }
     
