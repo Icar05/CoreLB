@@ -22,8 +22,13 @@ extension BaseComponent{
     }
     
     func getStep() -> Int{
-        return 0
+        return ( parent?.getStep() ?? 0 ) + 1
     }
+    
+    func getTabPrefix() -> String{
+        return String.init(repeating: "\t", count: getStep() - 1)
+    }
+
 }
 
 protocol CompositeComponent: BaseComponent {
@@ -38,17 +43,10 @@ extension CompositeComponent {
 
     func add(component: CompositeComponent) {}
     func remove(component: CompositeComponent) {}
+    
     func isComposite() -> Bool {
         return true
     }
-    func asBaseComponent() -> BaseComponent{
-        return self as BaseComponent
-    }
-    
-    func getStep() -> Int{
-        return ( parent?.getStep() ?? 0 ) + 1
-    }
-    
 }
 
 
@@ -64,7 +62,7 @@ class NonCompositeComponent: BaseComponent {
     var parent: CompositeComponent?
 
     func operation() -> String {
-        return "Non Composite: \(name)"
+        return "\(getTabPrefix())    [\(name) : \(getStep())]"
     }
 }
 
@@ -113,12 +111,8 @@ class ConcreteComposite: CompositeComponent {
     }
     
     func operation() -> String {
-        let step = getStep()
-        let tabPrefix = String.init(repeating: "\t", count: step - 1)
         let childrenResult: String = children.map{ "\n\($0.operation())" }.joined()
-        let myResult = "\(tabPrefix)    [\(name) : \(step)] " + childrenResult
-
-        return myResult
+        return "\(getTabPrefix())    [\(name) : \(getStep())] " + childrenResult 
     }
 }
 
@@ -129,8 +123,8 @@ class Client {
        let three =  ConcreteComposite("Root").add(components: [
                         ConcreteComposite("branchA").add(components: [
                             ConcreteComposite("subBranchA").add(components: [
-                                ConcreteComposite("Delta"),
-                                ConcreteComposite("Delta"),
+                                ConcreteComposite("deepBranchA"),
+                                ConcreteComposite("deepBranchB"),
                             ])
                         ]),
             
@@ -139,15 +133,15 @@ class Client {
                                 NonCompositeComponent("leafA"))
                         ),
             
-//            ConcreteComposite("branchC").add(component: [
-//                ConcreteComposite("subBranchC").add(component:
-//                    NonCompositeComponent("leafB")),
-//
-//                ConcreteComposite("subBranchD").add(components: [
-//                    NonCompositeComponent("leafC"),
-//                    NonCompositeComponent("leafD")
-//                ])
-//            ] as! BaseComponent)
+                        ConcreteComposite("branchC").add(component:
+                            ConcreteComposite("subBranchC").add(component:
+                                NonCompositeComponent("leafB"))
+                        ),
+
+                        ConcreteComposite("subBranchD").add(components: [
+                            NonCompositeComponent("leafC"),
+                            NonCompositeComponent("leafD")
+                        ])
         ])
         
         print("\(three.operation())")
