@@ -62,7 +62,7 @@ class NonCompositeComponent: BaseComponent {
     var parent: CompositeComponent?
 
     func operation() -> String {
-        return "\(getTabPrefix())    [\(name) : \(getStep())]"
+        return "\(getTabPrefix())    [Level: \(getStep()) : \(name)]"
     }
 }
 
@@ -111,9 +111,13 @@ class ConcreteComposite: CompositeComponent {
     }
     
     func operation() -> String {
+        
+        let lastPrefix = children.last is CompositeComponent ? "\n" : ""
         let childrenResult: String = children.map{ "\n\($0.operation())" }.joined()
-        return "\(getTabPrefix())    [\(name) : \(getStep())] " + childrenResult 
+    
+        return "\(getTabPrefix())    [Level: \(getStep()) : \(name)] " + childrenResult + lastPrefix
     }
+    
 }
 
 class Client {
@@ -123,7 +127,15 @@ class Client {
        let three =  ConcreteComposite("Root").add(components: [
                         ConcreteComposite("branchA").add(components: [
                             ConcreteComposite("subBranchA").add(components: [
-                                ConcreteComposite("deepBranchA"),
+                                ConcreteComposite("deepBranchA").add(
+                                    component: ConcreteComposite("abandonedBranch")
+                                        .add(component: ConcreteComposite("deep branch")
+                                            .add(components: [
+                                                NonCompositeComponent("LeafX"),
+                                                NonCompositeComponent("LeafX"),
+                                                NonCompositeComponent("LeafX")
+                                            ]))
+                                ),
                                 ConcreteComposite("deepBranchB"),
                             ])
                         ]),
