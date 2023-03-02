@@ -125,34 +125,34 @@ class Client {
     static func testSimpleThree(){
      
        let three =  ConcreteComposite("Root").add(components: [
-                        ConcreteComposite("branchA").add(components: [
-                            ConcreteComposite("subBranchA").add(components: [
-                                ConcreteComposite("deepBranchA").add(
-                                    component: ConcreteComposite("abandonedBranch")
-                                        .add(component: ConcreteComposite("deep branch")
+                        ConcreteComposite("Branch").add(components: [
+                            ConcreteComposite("Branch").add(components: [
+                                ConcreteComposite("Branch").add(
+                                    component: ConcreteComposite("Branch")
+                                        .add(component: ConcreteComposite("Branch")
                                             .add(components: [
-                                                NonCompositeComponent("LeafX"),
-                                                NonCompositeComponent("LeafX"),
-                                                NonCompositeComponent("LeafX")
+                                                NonCompositeComponent("Leaf"),
+                                                NonCompositeComponent("Leaf"),
+                                                NonCompositeComponent("Leaf")
                                             ]))
                                 ),
-                                ConcreteComposite("deepBranchB"),
+                                ConcreteComposite("Branch"),
                             ])
                         ]),
             
-                        ConcreteComposite("branchB").add(component:
-                            ConcreteComposite("subBranchB").add(component:
-                                NonCompositeComponent("leafA"))
+                        ConcreteComposite("Branch").add(component:
+                            ConcreteComposite("Branch").add(component:
+                                NonCompositeComponent("Leaf"))
                         ),
             
-                        ConcreteComposite("branchC").add(component:
-                            ConcreteComposite("subBranchC").add(component:
-                                NonCompositeComponent("leafB"))
+                        ConcreteComposite("Branch").add(component:
+                            ConcreteComposite("Branch").add(component:
+                                NonCompositeComponent("Leaf"))
                         ),
 
                         ConcreteComposite("subBranchD").add(components: [
-                            NonCompositeComponent("leafC"),
-                            NonCompositeComponent("leafD")
+                            NonCompositeComponent("Leaf"),
+                            NonCompositeComponent("Leaf")
                         ])
         ])
         
