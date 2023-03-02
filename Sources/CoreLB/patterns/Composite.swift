@@ -127,10 +127,9 @@ class Client {
        let three =  ConcreteComposite("Root").add(components: [
                         ConcreteComposite("Branch").add(components: [
                             ConcreteComposite("Branch").add(components: [
-                                ConcreteComposite("Branch").add(
-                                    component: ConcreteComposite("Branch")
-                                        .add(component: ConcreteComposite("Branch")
-                                            .add(components: [
+                                ConcreteComposite("Branch").add(component:
+                                    ConcreteComposite("Branch").add(component:
+                                        ConcreteComposite("Branch").add(components: [
                                                 NonCompositeComponent("Leaf"),
                                                 NonCompositeComponent("Leaf"),
                                                 NonCompositeComponent("Leaf")
