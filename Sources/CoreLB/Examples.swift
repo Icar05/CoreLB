@@ -13,6 +13,13 @@ public final class Examples{
     
     public init(){}
     
+    
+    
+    /** example of builder  using **/
+    public func testComposite(){
+        Client.testSimpleThree()
+    }
+    
 
     /** example of decorator using **/
     public func testDecorator(){
@@ -28,7 +35,7 @@ public final class Examples{
     
     
     /** example of chain of responsibility using **/
-    public func testChainPattern(){
+    public func testChainOfResponsibility(){
 
         let firstElement = Element(XHandler())
                 .setNext(Element(XHandler()))

@@ -8,31 +8,30 @@
 import Foundation
 
 
-/// Базовый класс Компонент объявляет общие операции как для простых, так и для
-/// сложных объектов структуры.
-protocol CompositeComponent {
-
-    /// При необходимости базовый Компонент может объявить интерфейс для
-    /// установки и получения родителя компонента в древовидной структуре. Он
-    /// также может предоставить  некоторую реализацию по умолчанию для этих
-    /// методов.
+protocol BaseComponent{
     var parent: CompositeComponent? { get set }
-
-    /// В некоторых случаях целесообразно определить операции управления
-    /// потомками прямо в базовом классе Компонент. Таким образом, вам не нужно
-    /// будет предоставлять  конкретные классы компонентов клиентскому коду,
-    /// даже во время сборки дерева объектов. Недостаток такого подхода в том,
-    /// что эти методы будут пустыми для компонентов уровня листа.
-    func add(component: CompositeComponent)
-    func remove(component: CompositeComponent)
-
-    /// Вы можете предоставить метод, который позволит клиентскому коду понять,
-    /// может ли компонент иметь вложенные объекты.
     func isComposite() -> Bool
-
-    /// Базовый Компонент может сам реализовать некоторое поведение по умолчанию
-    /// или поручить это конкретным классам.
     func operation() -> String
+    func getStep() -> Int
+}
+
+extension BaseComponent{
+    
+    func isComposite() -> Bool{
+        return false
+    }
+    
+    func getStep() -> Int{
+        return 0
+    }
+}
+
+protocol CompositeComponent: BaseComponent {
+    var children: [BaseComponent] { get }
+    func add(component: BaseComponent) -> BaseComponent
+    func remove(component: BaseComponent) -> BaseComponent
+    func add(components: [BaseComponent]) -> BaseComponent
+    func getStep() -> Int
 }
 
 extension CompositeComponent {
@@ -40,113 +39,119 @@ extension CompositeComponent {
     func add(component: CompositeComponent) {}
     func remove(component: CompositeComponent) {}
     func isComposite() -> Bool {
-        return false
+        return true
     }
+    func asBaseComponent() -> BaseComponent{
+        return self as BaseComponent
+    }
+    
+    func getStep() -> Int{
+        return ( parent?.getStep() ?? 0 ) + 1
+    }
+    
 }
 
 
-
-/// Класс Лист представляет собой конечные объекты структуры.  Лист не может
-/// иметь вложенных компонентов.
-///
-/// Обычно объекты Листьев выполняют фактическую работу, тогда как объекты
-/// Контейнера лишь делегируют работу своим подкомпонентам.
-class Leaf: CompositeComponent {
-
+// component without composition inside
+class NonCompositeComponent: BaseComponent {
+    
+    private let name: String
+    
+    init(_ name: String){
+        self.name = name
+    }
+    
     var parent: CompositeComponent?
 
     func operation() -> String {
-        return "Leaf"
+        return "Non Composite: \(name)"
     }
 }
 
-/// Класс Контейнер содержит сложные компоненты, которые могут иметь вложенные
-/// компоненты. Обычно объекты Контейнеры делегируют фактическую работу своим
-/// детям, а затем «суммируют» результат.
-class Composite: CompositeComponent {
 
+class ConcreteComposite: CompositeComponent {
+   
+    
+    private let name: String
+    
+    var children: [BaseComponent] = []
+    
     var parent: CompositeComponent?
+    
+    
+    init(_ name: String){
+        self.name = name
+    }
 
-    /// Это поле содержит поддерево компонентов.
-    private var children = [CompositeComponent]()
-
-    /// Объект контейнера может как добавлять компоненты в свой список вложенных
-    /// компонентов, так и удалять их, как простые, так и сложные.
-    func add(component: CompositeComponent) {
+    //remove child from self
+    @discardableResult
+    func add(component: BaseComponent) -> BaseComponent{
         var item = component
         item.parent = self
         children.append(item)
+        
+        return self as BaseComponent
+    }
+    
+    @discardableResult
+    func add(components: [BaseComponent]) -> BaseComponent {
+        components.forEach{add(component: $0)}
+        
+        return self as BaseComponent
     }
 
-    func remove(component: CompositeComponent) {
+    // add child
+    func remove(component: BaseComponent)  -> BaseComponent{
         children.indices.forEach{
             if(children[$0].operation() == component.operation()){
                 children[$0].parent = nil
                 children.remove(at: $0)
             }
         }
+        
+        return self as BaseComponent
     }
-
-    func isComposite() -> Bool {
-        return true
-    }
-
-    /// Контейнер выполняет свою основную логику особым образом. Он проходит
-    /// рекурсивно через всех своих детей, собирая и суммируя их результаты.
-    /// Поскольку потомки контейнера передают эти вызовы своим потомкам и так
-    /// далее,  в результате обходится всё дерево объектов.
+    
     func operation() -> String {
-        let result = children.map({ $0.operation() })
-        return "Branch(" + result.joined(separator: " ") + ")"
+        let step = getStep()
+        let tabPrefix = String.init(repeating: "\t", count: step - 1)
+        let childrenResult: String = children.map{ "\n\($0.operation())" }.joined()
+        let myResult = "\(tabPrefix)    [\(name) : \(step)] " + childrenResult
+
+        return myResult
     }
 }
 
 class Client {
 
-    /// Клиентский код работает со всеми компонентами через базовый интерфейс.
-    static func someClientCode(component: CompositeComponent) {
-        print("Result: " + component.operation())
+    static func testSimpleThree(){
+     
+       let three =  ConcreteComposite("Root").add(components: [
+                        ConcreteComposite("branchA").add(components: [
+                            ConcreteComposite("subBranchA").add(components: [
+                                ConcreteComposite("Delta"),
+                                ConcreteComposite("Delta"),
+                            ])
+                        ]),
+            
+                        ConcreteComposite("branchB").add(component:
+                            ConcreteComposite("subBranchB").add(component:
+                                NonCompositeComponent("leafA"))
+                        ),
+            
+//            ConcreteComposite("branchC").add(component: [
+//                ConcreteComposite("subBranchC").add(component:
+//                    NonCompositeComponent("leafB")),
+//
+//                ConcreteComposite("subBranchD").add(components: [
+//                    NonCompositeComponent("leafC"),
+//                    NonCompositeComponent("leafD")
+//                ])
+//            ] as! BaseComponent)
+        ])
+        
+        print("\(three.operation())")
+        
     }
-
-    /// Благодаря тому, что операции управления потомками объявлены в базовом
-    /// классе Компонента, клиентский код может работать как с простыми, так и
-    /// со сложными компонентами.
-    static func moreComplexClientCode(leftComponent: CompositeComponent, rightComponent: CompositeComponent) {
-        if leftComponent.isComposite() {
-            leftComponent.add(component: rightComponent)
-        }
-        print("Result: " + leftComponent.operation())
-    }
-}
-
-/// Давайте посмотрим как всё это будет работать.
-class CompositeConceptual {
-
-    func testCompositeConceptual() {
-
-        /// Таким образом, клиентский код может поддерживать простые компоненты-
-        /// листья...
-        print("Client: I've got a simple component:")
-        Client.someClientCode(component: Leaf())
-
-        /// ...а также сложные контейнеры.
-        let tree = Composite()
-
-        let branch1 = Composite()
-        branch1.add(component: Leaf())
-        branch1.add(component: Leaf())
-
-        let branch2 = Composite()
-        branch2.add(component: Leaf())
-        branch2.add(component: Leaf())
-
-        tree.add(component: branch1)
-        tree.add(component: branch2)
-
-        print("\nClient: Now I've got a composite tree:")
-        Client.someClientCode(component: tree)
-
-        print("\nClient: I don't need to check the components classes even when managing the tree:")
-        Client.moreComplexClientCode(leftComponent: tree, rightComponent: Leaf())
-    }
+    
 }
