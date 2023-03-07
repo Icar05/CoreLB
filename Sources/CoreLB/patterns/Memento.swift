@@ -109,7 +109,7 @@ class Caretaker {
     }
     
     //just return previous state
-    func redo(){
+    func undo(){
         guard !mementos.isEmpty else { return }
         let removedMemento = mementos.removeLast()
 
@@ -117,10 +117,10 @@ class Caretaker {
     }
 
     // save current + return previous
-    func undo() {
+    func redo() {
         
         let currentState = originator.prepareMemento()
-        self.redo()
+        self.undo()
         self.save(currentState)        
     }
 
@@ -156,15 +156,15 @@ class MementoConceptual {
         caretaker.showHistory()
 
         print("\n")
-        caretaker.undo()
-
-        print("\n")
-        caretaker.undo()
+        caretaker.redo()
 
         print("\n")
         caretaker.redo()
+
+        print("\n")
+        caretaker.undo()
         
         print("\n")
-        caretaker.redo()
+        caretaker.undo()
     }
 }
