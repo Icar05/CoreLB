@@ -14,6 +14,9 @@ public final class Examples{
     public init(){}
     
     
+    public func testMemento(){
+        MementoConceptual().testMementoConceptual()
+    }
     
     public func testAsyncCollector(){
         TestAboutActions().test()

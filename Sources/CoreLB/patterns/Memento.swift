@@ -8,45 +8,6 @@
 import Foundation
 
 
-/// Создатель содержит некоторое важное состояние, которое может со временем
-/// меняться. Он также объявляет метод сохранения состояния внутри снимка и
-/// метод восстановления состояния из него.
-class Originator {
-
-    /// Для удобства состояние создателя хранится внутри одной переменной.
-    private var state: String
-
-    init(state: String) {
-        self.state = state
-        print("Originator: My initial state is: \(state)")
-    }
-
-    /// Бизнес-логика Создателя может повлиять на его внутреннее состояние.
-    /// Поэтому клиент должен выполнить резервное копирование состояния с
-    /// помощью метода save перед запуском методов бизнес-логики.
-    func doSomething() {
-        print("Originator: I'm doing something important.")
-        state = generateRandomString()
-        print("Originator: and my state has changed to: \(state)")
-    }
-
-    private func generateRandomString() -> String {
-        return String(UUID().uuidString.suffix(4))
-    }
-
-    /// Сохраняет текущее состояние внутри снимка.
-    func save() -> Memento {
-        return ConcreteMemento(state: state)
-    }
-
-    /// Восстанавливает состояние Создателя из объекта снимка.
-    func restore(memento: Memento) {
-        guard let memento = memento as? ConcreteMemento else { return }
-        self.state = memento.state
-        print("Originator: My state has changed to: \(state)")
-    }
-}
-
 /// Интерфейс Снимка предоставляет способ извлечения метаданных снимка, таких
 /// как дата создания или название. Однако он не раскрывает состояние Создателя.
 protocol Memento {
@@ -71,35 +32,105 @@ class ConcreteMemento: Memento {
     var name: String { return state + " " + date.description.suffix(14).prefix(8) }
 }
 
+
+
+
+/// Создатель содержит некоторое важное состояние, которое может со временем
+/// меняться. Он также объявляет метод сохранения состояния внутри снимка и
+/// метод восстановления состояния из него.
+class Originator {
+    
+    
+    private let logName = String(describing: Originator.self)
+
+    /// Для удобства состояние создателя хранится внутри одной переменной.
+    private var state: String
+
+    init(state: String) {
+        self.state = state
+        printLog("initial state is: \(state)\n")
+    }
+
+    /// Бизнес-логика Создателя может повлиять на его внутреннее состояние.
+    /// Поэтому клиент должен выполнить резервное копирование состояния с
+    /// помощью метода save перед запуском методов бизнес-логики.
+    func makeChanges(_ value: String) {
+        state = value
+        printLog("Make chagnes... State: \(state)\n")
+    }
+
+    private func generateRandomString() -> String {
+        return String(UUID().uuidString.suffix(4))
+    }
+
+    /// Сохраняет текущее состояние внутри снимка.
+    func prepareMemento() -> Memento {
+        return ConcreteMemento(state: state)
+    }
+
+    /// Восстанавливает состояние Создателя из объекта снимка.
+    func restoreFromMemento(memento: Memento) {
+        guard let memento = memento as? ConcreteMemento else { return }
+        self.state = memento.state
+        printLog("Restored state: \(state)")
+    }
+    
+    private func printLog(_ value: String){
+        print("\(logName):  \(value)")
+    }
+}
+
+
+
 /// Опекун не зависит от класса Конкретного Снимка. Таким образом, он не имеет
 /// доступа к состоянию создателя, хранящемуся внутри снимка. Он работает со
 /// всеми снимками через базовый интерфейс Снимка.
 class Caretaker {
+    
+    private let logName = String(describing: Originator.self)
 
     private lazy var mementos = [Memento]()
+    
     private var originator: Originator
 
     init(originator: Originator) {
         self.originator = originator
     }
-
-    func backup() {
-        print("\nCaretaker: Saving Originator's state...\n")
-        mementos.append(originator.save())
+    
+    
+    func save(_ state: Memento){
+        printLog("Caretaker: Saving Originator's state...\(state.name)")
+        mementos.append(state)
     }
 
-    func undo() {
-
+    func save() {
+        printLog("Caretaker: Saving Originator's state...")
+        mementos.append(originator.prepareMemento())
+    }
+    
+    //just return previous state
+    func redo(){
         guard !mementos.isEmpty else { return }
         let removedMemento = mementos.removeLast()
 
-        print("Caretaker: Restoring state to: " + removedMemento.name)
-        originator.restore(memento: removedMemento)
+        originator.restoreFromMemento(memento: removedMemento)
+    }
+
+    // save current + return previous
+    func undo() {
+        
+        let currentState = originator.prepareMemento()
+        self.redo()
+        self.save(currentState)        
     }
 
     func showHistory() {
-        print("Caretaker: Here's the list of mementos:\n")
-        mementos.forEach({ print($0.name) })
+        printLog("Caretaker: Here's the list of mementos:\n")
+        mementos.forEach({ printLog(" -- \($0.name)")})
+    }
+    
+    private func printLog(_ value: String){
+        print("\(logName):  \(value)")
     }
 }
 
@@ -108,25 +139,32 @@ class MementoConceptual {
 
     func testMementoConceptual() {
 
-        let originator = Originator(state: "Super-duper-super-puper-super.")
+        let originator = Originator(state: "First state")
         let caretaker = Caretaker(originator: originator)
 
-        caretaker.backup()
-        originator.doSomething()
+        caretaker.save()
+        originator.makeChanges("RED")
 
-        caretaker.backup()
-        originator.doSomething()
+        caretaker.save()
+        originator.makeChanges("Orange")
 
-        caretaker.backup()
-        originator.doSomething()
-
+        caretaker.save()
+        originator.makeChanges("YELLOW")
+        
+        
         print("\n")
         caretaker.showHistory()
 
-        print("\nClient: Now, let's rollback!\n\n")
+        print("\n")
         caretaker.undo()
 
-        print("\nClient: Once more!\n\n")
+        print("\n")
         caretaker.undo()
+
+        print("\n")
+        caretaker.redo()
+        
+        print("\n")
+        caretaker.redo()
     }
 }
