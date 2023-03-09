@@ -150,21 +150,14 @@ class ConcreteComposite: CompositeComponent {
     
     private func handleAction(){
         
-        if(children.isEmpty){
+        if(children.isEmpty || (self.currentChildIndex >= self.children.count)){
             self.callback?(true)
             return
         }
         
         self.children[currentChildIndex].operation{ data in
-            
-            if(self.currentChildIndex < self.children.count - 1){
-                self.currentChildIndex += 1
-                self.handleAction()
-            }else{
-                self.callback?(true)
-                return
-            }
-
+            self.currentChildIndex += 1
+            self.handleAction()
         }
         
     }
