@@ -44,12 +44,20 @@ public class Decorator: ConcreteComponent {
     // this moment similar to chain of responsibility. Only one difference -
     // previous component is setted from contructor
     public final override func operation() {
-        self.extraOperation()
+        
+        if(needMainOperation()){
+            self.mainOperation()
+        }
+        
         self.component.operation()
     }
     
-    public func extraOperation(){
+    public func mainOperation(){
         print("Decorator")
+    }
+    
+    internal func needMainOperation() -> Bool{
+        return true
     }
 }
 
@@ -58,7 +66,7 @@ public class Decorator: ConcreteComponent {
 /// некоторым образом.
 public class ConcreteDecoratorA: Decorator {
     
-    override public func extraOperation() {
+    override public func mainOperation() {
         print("ConcreteDecoratorA")
     }
 }
@@ -67,15 +75,19 @@ public class ConcreteDecoratorA: Decorator {
 /// объекта.
 public class ConcreteDecoratorB: Decorator {
 
-    override public func extraOperation() {
+    override public func mainOperation() {
         print("ConcreteDecoratorB")
+    }
+    
+    internal override func needMainOperation() -> Bool {
+        return false
     }
 }
 
 
 public class ConcreteDecoratorC: Decorator {
 
-    override public func extraOperation() {
+    override public func mainOperation() {
         print("ConcreteDecoratorC")
     }
 }
