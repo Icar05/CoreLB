@@ -13,7 +13,7 @@ protocol BaseComponent{
     var parent: (CompositeComponent)? { get set }
     func isComposite() -> Bool
     func getStep() -> Int
-    func operation(_ callback: @escaping (Bool) -> Void )
+    func operation(_ callback: @escaping (Int) -> Void )
     func getDelayValue() -> Double
 }
 
@@ -32,8 +32,12 @@ extension BaseComponent{
         return String.init(repeating: "\t", count: getStep() - 1)
     }
     
+    func prepareName(name: String) -> String {
+        return "\(getTabPrefix())    [Level: \(getStep())  \"\(name)\" ]"
+    }
+    
     func getDelayValue() -> Double{
-        return 1.0
+        return 0.2
     }
 
 }
@@ -73,21 +77,17 @@ class NonCompositeComponent: BaseComponent {
     }
     
     var parent: (any CompositeComponent)?
-
-    func prepareName() -> String {
-        return "\(getTabPrefix())    [Level: \(getStep()) : \(name)]"
-    }
     
-    func operation(_ callback: @escaping (Bool) -> Void) {
+    func operation(_ callback: @escaping (Int) -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + getDelayValue()) { [weak self] in
             
             guard let self = self else {
                 return
             }
             
-            print(self.prepareName())
+            print(self.prepareName(name: self.name))
             
-            callback(true)
+            callback(1)
         }
     }
 }
@@ -99,6 +99,8 @@ class ConcreteComposite: CompositeComponent {
     
     private var currentChildIndex = 0
     
+    private var componentsCount = 1
+    
     private let name: String
     
     var identifier: String
@@ -107,7 +109,7 @@ class ConcreteComposite: CompositeComponent {
     
     var parent: (CompositeComponent)?
     
-    var callback: ((Bool) -> Void )? = nil
+    var callback: ((Int) -> Void )? = nil
     
     
     init(_ name: String){
@@ -144,25 +146,22 @@ class ConcreteComposite: CompositeComponent {
         return self
     }
     
-    private func prepareName() -> String {
-        return "\(getTabPrefix())    [Level: \(getStep()) : \(name)] "
-    }
-    
     private func handleAction(){
         
         if(children.isEmpty || (self.currentChildIndex >= self.children.count)){
-            self.callback?(true)
+            self.callback?(self.componentsCount)
             return
         }
         
         self.children[currentChildIndex].operation{ data in
+            self.componentsCount += data
             self.currentChildIndex += 1
             self.handleAction()
         }
         
     }
     
-    func operation(_ callback: @escaping (Bool) -> Void) {
+    func operation(_ callback: @escaping (Int) -> Void) {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + getDelayValue()) { [weak self] in
             
@@ -170,7 +169,7 @@ class ConcreteComposite: CompositeComponent {
                 return
             }
             
-            print(self.prepareName())
+            print(self.prepareName(name: self.name))
             
             self.callback = callback
             self.handleAction()
@@ -215,8 +214,8 @@ class Client {
                         ])
         ])
         
-        three.operation{ _ in
-            print("\n ____________________ \n Done!")
+        three.operation{ overallCount in
+            print("\n ____________________ \n Done with count: [\(overallCount)]")
         }
         
     }
