@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Command.swift
 //  
 //
 //  Created by Галяткин Александр on 09.03.2023.
