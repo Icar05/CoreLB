@@ -14,6 +14,11 @@ public final class Examples{
     public init(){}
     
     
+    public func testBuilder(){
+        TestBuilder.generalTest()
+        TestBuilder.chainTest()
+    }
+    
     public func testMemento(){
         MementoConceptual().testMementoConceptual()
     }
