@@ -9,7 +9,7 @@ import Foundation
 
 
 
-protocol Action{
+protocol AsyncAction{
     associatedtype T
     func loadData(_ callback: @escaping (T) -> Void )
 }
@@ -28,7 +28,7 @@ final class AsyncCollector<T>{
     
     
     
-    func collectResults(input: [any Action], onFinish: @escaping ([T]) -> Void, onUpdate: @escaping (T) -> Void ){
+    func collectResults(input: [any AsyncAction], onFinish: @escaping ([T]) -> Void, onUpdate: @escaping (T) -> Void ){
         self.onFinish = onFinish
         self.onUpdate = onUpdate
         self.totalCount = input.count
@@ -55,7 +55,7 @@ final class AsyncCollector<T>{
     
 }
 
-class SimpleAsynkActionOne: Action{
+class SimpleAsynkActionOne: AsyncAction{
     
     func loadData(_ callback: @escaping (String) -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
@@ -66,7 +66,7 @@ class SimpleAsynkActionOne: Action{
 }
 
 
-class SimpleAsynkActionTwo: Action{
+class SimpleAsynkActionTwo: AsyncAction{
     
     func loadData(_ callback: @escaping  (String) -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
@@ -76,7 +76,7 @@ class SimpleAsynkActionTwo: Action{
     
 }
 
-class SimpleAsynkActionThree: Action{
+class SimpleAsynkActionThree: AsyncAction{
     
     func loadData(_ callback: @escaping (String) -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 12.0) {
@@ -92,7 +92,7 @@ class TestAsyncCollector{
     
     
     func test(){
-        let actions: [any Action] = [
+        let actions: [any AsyncAction] = [
             SimpleAsynkActionOne(),
             SimpleAsynkActionTwo(),
             SimpleAsynkActionThree()
