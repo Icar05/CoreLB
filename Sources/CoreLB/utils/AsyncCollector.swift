@@ -7,43 +7,48 @@
 
 import Foundation
 
+
+
 protocol Action{
-    func loadData(_ callback: @escaping (String) -> Void )
+    associatedtype T
+    func loadData(_ callback: @escaping (T) -> Void )
 }
 
-final class AsyncCollector{
+final class AsyncCollector<T>{
     
     
     
-    private var onFinish: ((String) -> Void)? = nil
+    private var onFinish: (([T]) -> Void)? = nil
     
-    private var onUpdate: ((String) -> Void)? = nil
+    private var onUpdate: ((T) -> Void)? = nil
     
     private var totalCount = 0
 
-    private var collectedResaults: [String] = []
+    private var collectedResaults: [T] = []
     
     
     
-    func collectResults(input: [Action], onFinish: @escaping (String) -> Void, onUpdate: @escaping (String) -> Void ){
+    func collectResults(input: [any Action], onFinish: @escaping ([T]) -> Void, onUpdate: @escaping (T) -> Void ){
         self.onFinish = onFinish
         self.onUpdate = onUpdate
         self.totalCount = input.count
         
         input.forEach{
             $0.loadData{ data in
-                self.update(data: data)
+                if(data is T){
+                    self.update(data: data as! T)
+                }
             }
         }
     }
     
-    private func update(data: String){
+    private func update(data: T){
         self.collectedResaults.append(data)
         self.totalCount -= 1
         self.onUpdate?(data)
         
         if(totalCount == 0){
-            self.onFinish?(collectedResaults.joined())
+            self.onFinish?(collectedResaults)
         }
     }
     
@@ -81,20 +86,20 @@ class SimpleAsynkActionThree: Action{
     
 }
 
-class TestAboutActions{
+class TestAsyncCollector{
     
     
     
     
     func test(){
-        let actions: [Action] = [
+        let actions: [any Action] = [
             SimpleAsynkActionOne(),
             SimpleAsynkActionTwo(),
             SimpleAsynkActionThree()
         ]
         
         
-        AsyncCollector().collectResults(input: actions){ result in
+        AsyncCollector<String>().collectResults(input: actions){ result in
             print("result is: \(result)")
         } onUpdate: { update in
             print("update with  \(update)")

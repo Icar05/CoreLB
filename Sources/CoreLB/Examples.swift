@@ -24,7 +24,7 @@ public final class Examples{
     }
     
     public func testAsyncCollector(){
-        TestAboutActions().test()
+        TestAsyncCollector().test()
     }
     
     
