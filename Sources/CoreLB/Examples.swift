@@ -14,6 +14,10 @@ public final class Examples{
     public init(){}
     
     
+    public func testCommand(){
+        TestCommand().test()
+    }
+    
     public func testBuilder(){
         TestBuilder.generalTest()
         TestBuilder.chainTest()
