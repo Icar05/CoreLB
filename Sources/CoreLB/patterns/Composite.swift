@@ -81,12 +81,9 @@ class NonCompositeComponent: BaseComponent {
     func operation(_ callback: @escaping (Int) -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + getDelayValue()) { [weak self] in
             
-            guard let self = self else {
-                return
-            }
+            guard let self = self else { return}
             
             print(self.prepareName(name: self.name))
-            
             callback(1)
         }
     }
@@ -165,12 +162,9 @@ class ConcreteComposite: CompositeComponent {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + getDelayValue()) { [weak self] in
             
-            guard let self = self else {
-                return
-            }
+            guard let self = self else { return}
             
             print(self.prepareName(name: self.name))
-            
             self.callback = callback
             self.handleAction()
         }
