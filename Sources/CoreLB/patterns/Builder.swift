@@ -11,35 +11,45 @@ import Foundation
 
 /// Интерфейс Строителя объявляет создающие методы для различных частей объектов
 /// Продуктов.
-protocol Builder {
+protocol Builder<T> {
+    
+    associatedtype T
+    
+    var product: T { get  }
+    
     @discardableResult
-    func buildMainDependency() -> Builder
+    func buildMainDependency() -> Self
+    
     @discardableResult
-    func builtExtraDependency() -> Builder
+    func builtExtraDependency() -> Self
+    
     @discardableResult
-    func buildExpenciveDependency() -> Builder
-    func retrieveProduct() -> SimpleProduct
+    func buildExpenciveDependency() -> Self
+    
+    func retrieveProduct() -> T
+    
+    func reset()
 }
 
 /// Классы Конкретного Строителя следуют интерфейсу Строителя и предоставляют
 /// конкретные реализации шагов построения. Ваша программа может иметь несколько
 /// вариантов Строителей, реализованных по-разному.
 class SimpleBuilder: Builder {
-   
     
-    private var product = SimpleProduct()
+    internal var product = SimpleProduct()
+    
 
-    func buildMainDependency() -> Builder {
+    func buildMainDependency() -> Self {
         product.add(part: "Main part")
         return self
     }
     
-    func builtExtraDependency() -> Builder {
+    func builtExtraDependency() -> Self {
         product.add(part: "Extra part")
         return self
     }
     
-    func buildExpenciveDependency() -> Builder {
+    func buildExpenciveDependency() -> Self {
         product.add(part: "Expensive part")
         return self
     }
@@ -59,10 +69,10 @@ class SimpleBuilder: Builder {
 
 class Director {
 
-    private var builder: Builder?
+    private var builder: (any Builder)?
 
     
-    func update(builder: Builder) {
+    func update(builder: any Builder) {
         self.builder = builder
     }
 
@@ -84,22 +94,18 @@ class Director {
     
 }
 
-/// Имеет смысл использовать паттерн Строитель только тогда, когда ваши продукты
-/// достаточно сложны и требуют обширной конфигурации.
-///
-/// В отличие от других порождающих паттернов, различные конкретные строители
-/// могут производить несвязанные продукты. Другими словами, результаты
-/// различных строителей могут не всегда следовать одному и тому же интерфейсу.
 class SimpleProduct {
 
     private var parts = [String]()
+    
+    public init(){}
 
     func add(part: String) {
         self.parts.append(part)
     }
 
     func listParts() -> String {
-        return "Product parts: " + parts.joined(separator: ", ") + "\n"
+        return " \n - " + parts.joined(separator: " \n - ") + "\n"
     }
 }
 
@@ -112,15 +118,15 @@ class TestBuilder {
         let builder = SimpleBuilder()
         director.update(builder: builder)
         
-        print("MVP product")
+        print("# MVP product: ")
         director.buildMinimalViableProduct()
         print(builder.retrieveProduct().listParts())
 
-        print("Standard full featured product:")
+        print("# Standard full featured product: ")
         director.buildFullFeaturedProduct()
         print(builder.retrieveProduct().listParts())
 
-        print("Custom product:")
+        print("# Custom product: ")
         director.buildCustom()
         print(builder.retrieveProduct().listParts())
     }
@@ -133,6 +139,7 @@ class TestBuilder {
                         .buildExpenciveDependency()
                         .retrieveProduct()
         
+        print("# Chain product: ")
         print(product.listParts())
                         
         
