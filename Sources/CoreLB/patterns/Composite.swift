@@ -8,14 +8,16 @@
 import Foundation
 
 
-protocol BaseComponent: AsyncAction{
-    var parent: (any CompositeComponent)? { get set }
+protocol BaseComponent{
+    var identifier: String { get  }
+    var parent: (CompositeComponent)? { get set }
     func isComposite() -> Bool
     func getStep() -> Int
-    func loadData(_ callback: @escaping (Bool) -> Void )
+    func operation(_ callback: @escaping (Bool) -> Void )
 }
 
 extension BaseComponent{
+    
     
     func isComposite() -> Bool{
         return false
@@ -32,17 +34,17 @@ extension BaseComponent{
 }
 
 protocol CompositeComponent: BaseComponent {
-    var children: [any BaseComponent] { get }
-    func add(component: any BaseComponent) -> any BaseComponent
-    func remove(component: any BaseComponent) -> any BaseComponent
-    func add(components: [any BaseComponent]) -> any BaseComponent
+    var children: [BaseComponent] { get }
+    func add(component: BaseComponent) -> BaseComponent
+    func remove(component: BaseComponent) -> BaseComponent
+    func add(components: [BaseComponent]) -> BaseComponent
     func getStep() -> Int
 }
 
 extension CompositeComponent {
 
-    func add(component: any CompositeComponent) {}
-    func remove(component: any CompositeComponent) {}
+    func add(component: CompositeComponent) {}
+    func remove(component: CompositeComponent) {}
     func isComposite() -> Bool {
         return true
     }
@@ -53,25 +55,28 @@ extension CompositeComponent {
 
 // component without composition inside
 class NonCompositeComponent: BaseComponent {
-   
     
+    
+    
+    var identifier: String
     
     private let name: String
     
     init(_ name: String){
         self.name = name
+        self.identifier = UUID().uuidString
     }
     
     var parent: (any CompositeComponent)?
 
-    func operation() -> String {
+    func prepareName() -> String {
         return "\(getTabPrefix())    [Level: \(getStep()) : \(name)]"
     }
     
-    func loadData(_ callback: @escaping (Bool) -> Void) {
+    func operation(_ callback: @escaping (Bool) -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             
-            print(self.operation())
+            print(self.prepareName())
             
             callback(true)
         }
@@ -82,52 +87,55 @@ class NonCompositeComponent: BaseComponent {
 class ConcreteComposite: CompositeComponent {
    
     
+    
     private var currentChildIndex = 0
     
     private let name: String
     
-    var children: [any BaseComponent] = []
+    var identifier: String
     
-    var parent: (any CompositeComponent)?
+    var children: [BaseComponent] = []
+    
+    var parent: (CompositeComponent)?
     
     var callback: ((Bool) -> Void )? = nil
     
     
     init(_ name: String){
         self.name = name
+        self.identifier = UUID().uuidString
     }
 
     //remove child from self
     @discardableResult
-    func add(component: any BaseComponent) -> any BaseComponent{
+    func add(component: BaseComponent) -> BaseComponent{
         var item = component
         item.parent = self
         children.append(item)
         
-        return self as (any BaseComponent)
+        return self
     }
     
     @discardableResult
-    func add(components: [any BaseComponent]) -> any BaseComponent {
+    func add(components: [BaseComponent]) -> BaseComponent {
         components.forEach{add(component: $0)}
         
-        return self as (any BaseComponent)
+        return self
     }
 
-    // add child
-    #warning("fix it")
-    func remove(component: any BaseComponent)  -> any BaseComponent{
-//        children.indices.forEach{
-//            if(children[$0].operation() == component.operation()){
-//                children[$0].parent = nil
-//                children.remove(at: $0)
-//            }
-//        }
-//
-        return self as (any BaseComponent)
+    @discardableResult
+    func remove(component:BaseComponent)  -> BaseComponent{
+        children.indices.forEach{
+            if(children[$0].identifier == component.identifier){
+                children[$0].parent = nil
+                children.remove(at: $0)
+            }
+        }
+
+        return self
     }
     
-    func operation() -> String {
+    private func prepareName() -> String {
         return "\(getTabPrefix())    [Level: \(getStep()) : \(name)] "
     }
     
@@ -138,7 +146,7 @@ class ConcreteComposite: CompositeComponent {
             return
         }
         
-        self.children[currentChildIndex].loadData{ data in
+        self.children[currentChildIndex].operation{ data in
             
             if(self.currentChildIndex < self.children.count - 1){
                 self.currentChildIndex += 1
@@ -152,11 +160,11 @@ class ConcreteComposite: CompositeComponent {
         
     }
     
-    func loadData(_ callback: @escaping (Bool) -> Void) {
+    func operation(_ callback: @escaping (Bool) -> Void) {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
             
-            print(self.operation())
+            print(self.prepareName())
             
             self.callback = callback
             self.handleAction()
@@ -201,7 +209,7 @@ class Client {
                         ])
         ])
         
-        three.loadData{ _ in
+        three.operation{ _ in
             print("\n ____________________ \n Done!")
         }
         
