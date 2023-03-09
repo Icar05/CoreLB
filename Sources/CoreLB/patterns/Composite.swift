@@ -14,6 +14,7 @@ protocol BaseComponent{
     func isComposite() -> Bool
     func getStep() -> Int
     func operation(_ callback: @escaping (Bool) -> Void )
+    func getDelayValue() -> Double
 }
 
 extension BaseComponent{
@@ -29,6 +30,10 @@ extension BaseComponent{
     
     func getTabPrefix() -> String{
         return String.init(repeating: "\t", count: getStep() - 1)
+    }
+    
+    func getDelayValue() -> Double{
+        return 1.0
     }
 
 }
@@ -74,7 +79,11 @@ class NonCompositeComponent: BaseComponent {
     }
     
     func operation(_ callback: @escaping (Bool) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + getDelayValue()) { [weak self] in
+            
+            guard let self = self else {
+                return
+            }
             
             print(self.prepareName())
             
@@ -162,7 +171,11 @@ class ConcreteComposite: CompositeComponent {
     
     func operation(_ callback: @escaping (Bool) -> Void) {
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + getDelayValue()) { [weak self] in
+            
+            guard let self = self else {
+                return
+            }
             
             print(self.prepareName())
             
