@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Decorator.swift
 //  
 //
 //  Created by Галяткин Александр on 24.02.2023.

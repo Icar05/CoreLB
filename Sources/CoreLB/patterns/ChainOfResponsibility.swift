@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ChainOfResponsibility.swift
 //  
 //
 //  Created by Галяткин Александр on 23.02.2023.

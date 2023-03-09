@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Composite.swift
 //  
 //
 //  Created by Галяткин Александр on 28.02.2023.
