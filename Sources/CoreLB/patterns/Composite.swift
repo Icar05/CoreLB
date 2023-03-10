@@ -37,7 +37,7 @@ extension BaseComponent{
     }
     
     func getDelayValue() -> Double{
-        return 0.2
+        return 0.1
     }
 
 }
