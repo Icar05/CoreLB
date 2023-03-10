@@ -151,5 +151,6 @@ class TestCommand {
         invoker.repeatLast()
         invoker.repeatLast()
         invoker.repeatLast()
+        invoker.repeatLast()
     }
 }
