@@ -115,8 +115,7 @@ class Invoker {
         }
         
         print("\nInvoker: repeat last...")
-        usedCommands.last?.execute()
-        usedCommands.removeLast()
+        usedCommands.removeLast().execute()
     }
 }
 
