@@ -88,25 +88,33 @@ class Invoker {
         onFinish = command
     }
 
-    /// Отправитель не зависит от классов конкретных команд и получателей.
-    /// Отправитель передаёт запрос получателю косвенно, выполняя команду.
+    /// we can call each command togheter if we want
     func invoke() {
         print("Invoker: execute start and finish commands:")
         
+        invokeStart()
+        invokeFinish()
+    }
+    
+    func invokeStart() {
         if(onStart != nil){
             print("\nInvoker: Start command:")
             onStart?.execute()
             usedCommands.append(onStart!)
         }
-        
+    }
+    
+    ////we can call specifical commands
+    func invokeFinish(){
         if(onFinish != nil){
             print("\nInvoker: Finish command:")
             onFinish?.execute()
             usedCommands.append(onFinish!)
         }
-
     }
     
+    
+    //// we can mamage last commands
     func repeatLast(){
         
         if(usedCommands.isEmpty){
@@ -138,6 +146,7 @@ class TestCommand {
         invoker.setOnFinish(complexCommand)
         
         invoker.invoke()
+        invoker.invokeFinish()
         
         invoker.repeatLast()
         invoker.repeatLast()
