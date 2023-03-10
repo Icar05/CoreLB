@@ -24,7 +24,7 @@ class SimpleCommand: Command {
     }
 
     func execute() {
-        print("Simple command:  (" + payload + ")")
+        print("- Simple command Executed:  (" + payload + ")")
     }
 }
 
@@ -48,7 +48,7 @@ class ComplexCommand: Command {
 
     /// Команды могут делегировать выполнение любым методам получателя.
     func execute() {
-        print("Complex Command: Call receiver do thigs: \n")
+        print("- Complex Command Executed: Call receiver ...")
         receiver.doSomething(a)
         receiver.doSomethingElse(b)
     }
@@ -60,11 +60,11 @@ class ComplexCommand: Command {
 class Receiver {
 
     func doSomething(_ a: String) {
-        print("- Receiver: Working on (" + a + ")")
+        print(" - Receiver:  (" + a + ")")
     }
 
     func doSomethingElse(_ b: String) {
-        print("- Receiver: Also working on (" + b + ")")
+        print(" - Receiver:  (" + b + ")")
     }
 }
 
@@ -72,6 +72,9 @@ class Receiver {
 /// команде.
 class Invoker {
 
+    
+    private var usedCommands: [Command] = []
+    
     private var onStart: Command?
 
     private var onFinish: Command?
@@ -88,9 +91,32 @@ class Invoker {
     /// Отправитель не зависит от классов конкретных команд и получателей.
     /// Отправитель передаёт запрос получателю косвенно, выполняя команду.
     func invoke() {
-        print("Invoker: execute commands")
-        onStart?.execute()
-        onFinish?.execute()
+        print("Invoker: execute start and finish commands:")
+        
+        if(onStart != nil){
+            print("\nInvoker: Start command:")
+            onStart?.execute()
+            usedCommands.append(onStart!)
+        }
+        
+        if(onFinish != nil){
+            print("\nInvoker: Finish command:")
+            onFinish?.execute()
+            usedCommands.append(onFinish!)
+        }
+
+    }
+    
+    func repeatLast(){
+        
+        if(usedCommands.isEmpty){
+            print("\nInvoker: commands list clear.")
+            return
+        }
+        
+        print("\nInvoker: repeat last...")
+        usedCommands.last?.execute()
+        usedCommands.removeLast()
     }
 }
 
@@ -113,5 +139,9 @@ class TestCommand {
         invoker.setOnFinish(complexCommand)
         
         invoker.invoke()
+        
+        invoker.repeatLast()
+        invoker.repeatLast()
+        invoker.repeatLast()
     }
 }
