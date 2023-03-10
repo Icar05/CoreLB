@@ -91,3 +91,19 @@ public class ConcreteDecoratorC: Decorator {
         print("ConcreteDecoratorC")
     }
 }
+
+
+class TestDecorator {
+
+    static func test(){
+        ConcreteDecoratorC(
+              ConcreteDecoratorB(
+                  ConcreteDecoratorA(
+                      ConcreteComponent()
+                  )
+              )
+          )
+          .operation()
+    }
+    
+}

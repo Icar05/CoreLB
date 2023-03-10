@@ -91,7 +91,7 @@ class TestAsyncCollector{
     
     
     
-    func test(){
+    static func test(){
         let actions: [any AsyncAction] = [
             SimpleAsynkActionOne(),
             SimpleAsynkActionTwo(),

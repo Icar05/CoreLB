@@ -135,9 +135,9 @@ class Caretaker {
 }
 
 /// Давайте посмотрим как всё это будет работать.
-class MementoConceptual {
+class TestMemento {
 
-    func testMementoConceptual() {
+    static func test() {
 
         let originator = Originator(state: "First state")
         let caretaker = Caretaker(originator: originator)

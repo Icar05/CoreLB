@@ -165,3 +165,46 @@ public class ChainOfResponibilityHelper{
     
 }
 
+/// Давайте посмотрим как всё это будет работать.
+class TestChainResponsibility {
+    
+    static func test() {
+       
+        
+        //raw chain call, need start from first element
+        let firstElement = Element<XHandler>()
+
+            //append next elements
+            firstElement
+                  .setNext(Element<YHandler>())
+                  .setNext(Element<XHandler>())
+                  .setNext(Element<YHandler>())
+                  .setNext(Element<XHandler>())
+                  .setNext(Element<YHandler>())
+                  .setNext(Element<XHandler>())
+                  .setNext(Element<YHandler>())
+                  .setNext(Element<ZHandler>())
+
+
+            // start from top
+            firstElement.handleRequest(data: "TestData")
+        
+        
+        
+        // helper will store first element for you
+        ChainOfResponibilityHelper()
+            .appendElement(Element<XHandler>())
+            .appendElement(Element<YHandler>())
+            .appendElement(Element<ZHandler>())
+            .handleRequest("Example of stored chain")
+        
+
+        ChainOfResponibilityHelper.prepareChainFromHandlers(
+            hadlers: [
+                Element<XHandler>(),
+                Element<YHandler>(),
+                Element<ZHandler>()
+            ]
+        )?.handleRequest(data: "Chain from array")
+    }
+}

@@ -173,9 +173,9 @@ class ConcreteComposite: CompositeComponent {
     
 }
 
-class Client {
+class TestComposite {
 
-    static func testSimpleThree(){
+    static func test(){
      
        let three =  ConcreteComposite("Root").add(components: [
                         ConcreteComposite("Branch 2").add(components: [

@@ -96,3 +96,34 @@ public class DispatchUtil{
     }
 }
 
+
+class TestDispatchUtil{
+    
+    static func test(){
+        DispatchUtil.getInstance()
+            .doAction(callback: doTest)
+            .doAction(callback: doTest2)
+            .doOnFinish(queue: .main, callback: doOnFinish)
+            .execute(qos: .userInitiated)
+    }
+    
+    
+    /** dispatcher methods **/
+    private static func doTest(callback:  Closure?) -> Void{
+        sleep(7)
+        print("⚡️ doTest ⚡️ Name: \(OperationQueue.current?.underlyingQueue?.label ?? "None")\r")
+        callback?()
+    }
+    
+    private static func doTest2(callback:  Closure?) -> Void{
+        sleep(3)
+        print("⚡️ doTest2 ⚡️ Name: \(OperationQueue.current?.underlyingQueue?.label ?? "None")\r")
+        callback?()
+    }
+    
+    private static func doOnFinish(callback:  Closure?) -> Void{
+        print("⚡️ doOnFinish ⚡️ Name: \(OperationQueue.current?.underlyingQueue?.label ?? "None")\r")
+        callback?()
+    }
+    
+}
