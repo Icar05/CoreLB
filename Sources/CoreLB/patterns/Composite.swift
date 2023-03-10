@@ -143,7 +143,7 @@ class ConcreteComposite: CompositeComponent {
         return self
     }
     
-    private func handleAction(){
+    private func callChildOperation(){
         
         if(children.isEmpty || (self.currentChildIndex >= self.children.count)){
             self.callback?(self.componentsCount)
@@ -153,7 +153,7 @@ class ConcreteComposite: CompositeComponent {
         self.children[currentChildIndex].operation{ data in
             self.componentsCount += data
             self.currentChildIndex += 1
-            self.handleAction()
+            self.callChildOperation()
         }
         
     }
@@ -166,7 +166,7 @@ class ConcreteComposite: CompositeComponent {
             
             print(self.prepareName(name: self.name))
             self.callback = callback
-            self.handleAction()
+            self.callChildOperation()
         }
 
     }
