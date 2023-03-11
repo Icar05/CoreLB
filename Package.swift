@@ -20,7 +20,13 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "CoreLB",
-            dependencies: []),
+            dependencies: [],
+            resources: [
+                .process("Resources/Sounds/Click.mp3"),
+                .process("Resources/Sounds/NewClick.mp3")
+            ]
+        ),
+        
         .testTarget(
             name: "CoreLBTests",
             dependencies: ["CoreLB"]),
