@@ -18,6 +18,5 @@ Patterns:
 
 Composite:
 
-![alt text](https://github.com/Icar05/CoreLB/blob/composer.png)
-![alt text](https://github.com/Icar05/CoreLB/blob/composer.gif)
-
+![alt text](https://github.com/Icar05/CoreLB/blob/main/composer.png)
+![alt text](https://github.com/Icar05/CoreLB/blob/main/composer.gif)
