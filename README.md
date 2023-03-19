@@ -15,4 +15,9 @@ Patterns:
 - Memento
 
 
-Unfortunately, I am too lazy to prepare examles of using. Maybe, later. I am not sure
+
+Composite:
+
+![alt text](https://github.com/Icar05/RS/blob/main/Menu.jpg)
+![alt text](https://github.com/Icar05/RS/blob/main/Create.jpg)
+
