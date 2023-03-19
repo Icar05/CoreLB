@@ -14,6 +14,7 @@ Patterns:
 - Decorator
 - Memento
 
+(as base used https://refactoring.guru/ru/design-patterns/swift )
 
 
 Composite:
