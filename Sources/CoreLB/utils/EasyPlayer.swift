@@ -11,9 +11,33 @@ import Foundation
 import AVFoundation
 
 public enum SoundCaf: String{
-    case Click = "Click"
-    case NewClick = "NewClick"
+    case DoubleClick      =  "DoubleClick"
+    case MouseOff         =  "MouseOff"
+    case MouseOn          =  "MouseOn"
+    case RecorderClick    =  "RecorderClick"
+    case Response         =  "Response"
+    case Ring             =  "Ring"
+    case SimpleResponse   =  "SimpleResponse"
+    case SwitchOff        =  "SwitchOff"
+    case SwitchOn         =  "SwitchOn"
+    case Tap              =  "Tap"
 }
+
+public extension SoundCaf{
+    
+    static func responseSound() -> SoundCaf {
+        return .Response
+    }
+    
+    static func simpleResponceSound() -> SoundCaf{
+        return .SimpleResponse
+    }
+    
+    static func actionSound() -> SoundCaf{
+        return .MouseOff
+    }
+}
+
 
 
 public final class EasyPlayer{

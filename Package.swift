@@ -22,8 +22,7 @@ let package = Package(
             name: "CoreLB",
             dependencies: [],
             resources: [
-                .process("Resources/Sounds/Click.mp3"),
-                .process("Resources/Sounds/NewClick.mp3")
+                .process("Resources")
             ]
         ),
         
