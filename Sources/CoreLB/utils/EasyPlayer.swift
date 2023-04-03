@@ -36,6 +36,10 @@ public extension SoundCaf{
     static func actionSound() -> SoundCaf{
         return .MouseOff
     }
+    
+    static func switchSound() -> SoundCaf{
+        return .SwitchOff
+    }
 }
 
 
