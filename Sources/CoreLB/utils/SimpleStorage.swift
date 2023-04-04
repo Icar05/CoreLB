@@ -8,7 +8,7 @@
 import Foundation
 
 
-public final class SimpleStorage{
+open class SimpleStorage{
     
     
     public init() {}
@@ -21,6 +21,16 @@ public final class SimpleStorage{
     
     public func readInt(_ key: String) -> Int{
         return UserDefaults.standard.integer(forKey: key)
+    }
+ 
+    @discardableResult
+    public func updateObj(_ data: Data, _ key: String) -> Bool{
+        UserDefaults.standard.set(data, forKey: key)
+        return true
+    }
+    
+    public func readObj(_ key: String) -> Data?{
+        return UserDefaults.standard.data(forKey: key)
     }
     
 }
