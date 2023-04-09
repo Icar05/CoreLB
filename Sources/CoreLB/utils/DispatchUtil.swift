@@ -15,14 +15,10 @@ public typealias Closure1<T> = (T) -> Void
 public typealias DispatchUtilCompletion = (_ onLeave: Closure?) -> Void
 
 
+
 public class DispatchUtil{
     
     
-    
-    
-    
-    private static let shared = DispatchUtil()
-        
     private let group = DispatchGroup()
     
     private var callbacks: [DispatchUtilCompletion?] = []
@@ -32,14 +28,7 @@ public class DispatchUtil{
     private var onFinishCallbackQueue: DispatchQueue = .main
     
     
-    
-    
-    private init() { }
-
-    public static func getInstance() -> DispatchUtil{
-        return shared
-    }
-    
+    public init() { }
     
     
     public func doAction(callback:  DispatchUtilCompletion?) -> DispatchUtil{
@@ -59,29 +48,24 @@ public class DispatchUtil{
     }
     
     public func execute(qos: DispatchQoS.QoSClass){
-        
-
-        DispatchQueue.global(qos: qos).async { [weak self] in
-            
-            guard let self = self else { return }
+        DispatchQueue.global(qos: qos).async {
             
             self.callbacks.forEach{ callback in
                 self.group.enter()
                 callback!({
                     self.onLeave()
                 })
+                self.callbacks.removeFirst()
                 self.group.wait()                
             }
             
             
-            self.group.notify(queue: self.onFinishCallbackQueue) {[weak self] in
-                
-                guard let self = self else { return }
-                
+            self.group.notify(queue: self.onFinishCallbackQueue) {
                 if(self.onFinishCallback != nil){
                     self.onFinishCallback!({
 
                     })
+                    self.onFinishCallback = nil
                 }
                 self.clear()
             }
@@ -100,7 +84,7 @@ public class DispatchUtil{
 class TestDispatchUtil{
     
     static func test(){
-        DispatchUtil.getInstance()
+        DispatchUtil()
             .doAction(callback: doTest)
             .doAction(callback: doTest2)
             .doOnFinish(queue: .main, callback: doOnFinish)
