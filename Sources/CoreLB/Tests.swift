@@ -57,4 +57,21 @@ public final class Tests{
         TestDispatchUtil.test()
     }
     
+    public static func requesterTroubleTest() {
+        let url =  "https://pikabu.ru/@SPINE.CONFESSION".replacingOccurrences(of: "@", with: "%2F%40")
+        
+        if let url = URL(string: url) {
+            print("url: \(url)")
+            
+            do {
+                 let result = try String(contentsOf: url, encoding: .windowsCP1251)
+                print("success! -> \(result.count)")
+            } catch {
+                print("NewsSource: error while read url: \(error)")
+            }
+        } else {
+            print("NewsSource: bad url")
+        }
+    }
+    
 }
