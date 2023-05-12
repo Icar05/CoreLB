@@ -94,15 +94,17 @@ class TestDispatchUtil{
     
     /** dispatcher methods **/
     private static func doTest(callback:  Closure?) -> Void{
-        sleep(7)
-        print("⚡️ doTest ⚡️ Name: \(OperationQueue.current?.underlyingQueue?.label ?? "None")\r")
-        callback?()
+        DispatchQueue.global().asyncAfter(deadline: .now() + 7) {
+            print("⚡️ doTest ⚡️ Name: test1, 7")
+            callback?()
+        }
     }
     
     private static func doTest2(callback:  Closure?) -> Void{
-        sleep(3)
-        print("⚡️ doTest2 ⚡️ Name: \(OperationQueue.current?.underlyingQueue?.label ?? "None")\r")
-        callback?()
+        DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+            print("⚡️ doTest ⚡️ Name: test2, 3")
+            callback?()
+        }
     }
     
     private static func doOnFinish(callback:  Closure?) -> Void{
