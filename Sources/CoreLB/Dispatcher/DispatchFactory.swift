@@ -11,9 +11,7 @@ public final class  DispatchFactory{
     
     
     private let testService = TestService()
-    
-    public var temp = ""
-    
+        
     public init(){}
     
 
