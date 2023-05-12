@@ -82,7 +82,6 @@ public final class TestDispatcher{
             .doAction(factory.getAction(interval: 2, name: "#4", callback: {  data in
                 print("Data: \(data)")
             }))
-            .wait()
             .doOnFinish(factory.getFinishAction(interval: 2, callback: { data in
                 print("Result: \(data)")
             }))
