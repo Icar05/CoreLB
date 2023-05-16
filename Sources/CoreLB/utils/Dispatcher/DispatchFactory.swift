@@ -19,14 +19,13 @@ public final class  DispatchFactory{
     public func getAction(
         interval: Double,
         name: String,
-        callback: @escaping (String) -> Void) -> DispatchUtilCommand{
-            return .action({onLeave in
+        callback: @escaping (String) -> Void) -> DispatchUtilCompletion{
+            return { onLeave in
                 self.testService.doSomething(interval: interval, name: name, callback: { data in
                    callback(data)
                    onLeave?()
                 })
-                
-            })
+            }
     }
     
     public func getFinishAction(interval: Double, callback: @escaping (String) -> Void) -> Closure{

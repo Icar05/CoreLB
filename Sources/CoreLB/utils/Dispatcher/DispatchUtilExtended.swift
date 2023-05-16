@@ -1,17 +1,19 @@
 //
-//  File.swift
+//  DispatchUtilExtended.swift
 //
 //
-//  Created by Галяткин Александр on 17.01.2023.
+//  Created by Галяткин Александр on 16.05.2023.
 //
 
 import Foundation
 
 
+
 public enum DispatchUtilCommand{
-    case action(DispatchUtilCompletion)
+    case action(Int, DispatchUtilCompletion)
     case wait
 }
+
 
 
 public class DispatchUtilExtended{
@@ -19,17 +21,21 @@ public class DispatchUtilExtended{
     
     
     
+    private var counter = 0
+    
     private let group = DispatchGroup()
     
     private var commands = [DispatchUtilCommand]()
+    
+    private var usedIds: [Int] = []
             
     private var onFinishCommand: Closure? = nil
     
     public init() { }
     
     
-    public func doAction(_ command: DispatchUtilCommand) -> DispatchUtilExtended{
-        self.commands.append(command)
+    public func doAction(_ action: @escaping DispatchUtilCompletion) -> DispatchUtilExtended{
+        self.commands.append(DispatchUtilCommand.action(generateId(), action))
         return self
     }
     
@@ -44,8 +50,17 @@ public class DispatchUtilExtended{
     }
     
     
-    private func onLeave(){
-        self.group.leave()
+    private func generateId() -> Int{
+        self.counter += 1
+        return counter
+    }
+    
+    
+    private func onLeave(_ id: Int){
+        if(!usedIds.contains(id)){
+            self.usedIds.append(id)
+            self.group.leave()
+        }
     }
     
     public func execute(qos: DispatchQoS.QoSClass){
@@ -55,10 +70,10 @@ public class DispatchUtilExtended{
             // handle each of actions
             self.commands.forEach{ command in
                 switch command{
-                case .action(let completion) :
+                case .action(let id, let completion) :
                     self.group.enter()
                     completion {
-                        self.onLeave()
+                        self.onLeave(id)
                     }; break
                     
                 case .wait:
@@ -76,6 +91,8 @@ public class DispatchUtilExtended{
     }
     
     private func clear(){
+        self.usedIds.removeAll()
+        self.counter = 0
         self.commands.removeAll()
         self.onFinishCommand = nil
     }
